@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dataset Check</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <main class="app">
+      <header class="topbar">
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true">{ }</span>
+          <div>
+            <h1>Dataset Check</h1>
+            <p>JSON / JSONL 数据集检查器</p>
+          </div>
+        </div>
+        <span class="local-badge"><i></i>仅本地处理</span>
+      </header>
+
+      <section class="input-section" aria-labelledby="input-title">
+        <div class="section-head">
+          <div>
+            <span class="step">01</span>
+            <h2 id="input-title">放入数据</h2>
+          </div>
+          <div class="format-tabs" role="group" aria-label="数据格式">
+            <button type="button" class="format-button active" data-format="auto">自动</button>
+            <button type="button" class="format-button" data-format="json">JSON</button>
+            <button type="button" class="format-button" data-format="jsonl">JSONL</button>
+          </div>
+        </div>
+
+        <div class="editor-card" id="drop-zone">
+          <div class="editor-toolbar">
+            <span id="file-name">粘贴内容，或拖入文件</span>
+            <label class="file-button">
+              选择文件
+              <input id="file-input" type="file" accept=".json,.jsonl,application/json,application/x-ndjson" />
+            </label>
+          </div>
+          <textarea id="source-input" aria-label="JSON 或 JSONL 数据" spellcheck="false" placeholder='例如：&#10;{"id": 1, "question": "什么是 RAG？"}&#10;{"id": 2, "question": "什么是 Agent？"}'></textarea>
+          <div class="editor-footer">
+            <div class="input-meta">
+              <span id="line-count">0 行</span>
+              <span id="size-count">0 B</span>
+            </div>
+            <div class="editor-actions">
+              <button type="button" class="text-button" id="sample-button">载入示例</button>
+              <button type="button" class="text-button" id="clear-button">清空</button>
+              <button type="button" class="primary-button" id="check-button">开始检查 <b>→</b></button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="results-section hidden" id="results-section" aria-labelledby="results-title" aria-live="polite">
+        <div class="section-head results-head">
+          <div>
+            <span class="step">02</span>
+            <h2 id="results-title">检查结果</h2>
+          </div>
+          <button type="button" class="export-button" id="export-button">导出报告</button>
+        </div>
+
+        <div class="summary-card" id="summary-card">
+          <div class="summary-status">
+            <span class="status-icon" id="status-icon">✓</span>
+            <div>
+              <strong id="status-title">数据看起来不错</strong>
+              <p id="status-copy">没有发现需要处理的问题</p>
+            </div>
+          </div>
+          <div class="stats">
+            <div><strong id="record-stat">0</strong><span>条记录</span></div>
+            <div><strong id="field-stat">0</strong><span>个字段</span></div>
+            <div><strong id="error-stat">0</strong><span>个错误</span></div>
+            <div><strong id="warning-stat">0</strong><span>个提醒</span></div>
+          </div>
+        </div>
+
+        <div class="issues-wrap">
+          <div class="issue-filter" role="group" aria-label="结果筛选">
+            <button type="button" class="issue-filter-button active" data-filter="all">全部 <span id="all-count">0</span></button>
+            <button type="button" class="issue-filter-button" data-filter="error">错误 <span id="error-count">0</span></button>
+            <button type="button" class="issue-filter-button" data-filter="warning">提醒 <span id="warning-count">0</span></button>
+          </div>
+          <div id="issues-list" class="issues-list"></div>
+        </div>
+
+        <details class="schema-card" id="schema-card">
+          <summary>查看字段结构 <span id="schema-summary"></span></summary>
+          <div class="schema-list" id="schema-list"></div>
+        </details>
+      </section>
+
+      <footer>数据不会离开你的浏览器</footer>
+    </main>
+
+    <script src="popup.js"></script>
+  </body>
+</html>
+

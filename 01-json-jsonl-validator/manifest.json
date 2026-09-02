@@ -1,0 +1,11 @@
+{
+  "manifest_version": 3,
+  "name": "Dataset Check",
+  "version": "1.0.0",
+  "description": "在浏览器本地检查 JSON / JSONL 数据集的格式和常见质量问题。",
+  "action": {
+    "default_title": "Dataset Check",
+    "default_popup": "popup.html"
+  }
+}
+
