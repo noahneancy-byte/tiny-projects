@@ -1,0 +1,10 @@
+{
+  "manifest_version": 3,
+  "name": "Token Budget - AI 成本计算器",
+  "version": "1.0.0",
+  "description": "输入 Token 和调用量，对比主流 AI 模型的单次与月度成本。",
+  "action": {
+    "default_title": "Token Budget",
+    "default_popup": "popup.html"
+  }
+}

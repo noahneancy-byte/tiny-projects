@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Token Budget</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <main class="app">
+      <header class="topbar">
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true">$</span>
+          <div>
+            <h1>Token Budget</h1>
+            <p>AI 成本计算器</p>
+          </div>
+        </div>
+        <div class="snapshot">
+          <span>价格快照</span>
+          <strong id="price-date">—</strong>
+        </div>
+      </header>
+
+      <section class="hero">
+        <span class="eyebrow">BEFORE YOU SHIP</span>
+        <h2>先算清，<em>每一次调用</em>。</h2>
+        <p>输入你的使用规模，立刻比较主流模型的单次和月度成本。</p>
+      </section>
+
+      <section class="calculator" aria-labelledby="input-title">
+        <div class="section-heading">
+          <div><span>01</span><h3 id="input-title">描述使用场景</h3></div>
+          <button class="reset-button" id="reset-button" type="button">恢复默认</button>
+        </div>
+
+        <div class="preset-tabs" role="group" aria-label="场景模板">
+          <button type="button" data-preset="support">客服问答</button>
+          <button type="button" class="active" data-preset="rag">RAG 助手</button>
+          <button type="button" data-preset="agent">Agent 工作流</button>
+          <button type="button" data-preset="custom">自定义</button>
+        </div>
+
+        <div class="input-card">
+          <div class="field-grid">
+            <label class="field">
+              <span>单次输入 Token</span>
+              <div class="number-wrap"><input id="input-tokens" type="number" min="0" step="100" inputmode="numeric" /><i>tokens</i></div>
+            </label>
+            <label class="field">
+              <span>单次输出 Token</span>
+              <div class="number-wrap"><input id="output-tokens" type="number" min="0" step="100" inputmode="numeric" /><i>tokens</i></div>
+            </label>
+            <label class="field">
+              <span>每月调用量</span>
+              <div class="number-wrap"><input id="monthly-requests" type="number" min="0" step="1000" inputmode="numeric" /><i>次</i></div>
+            </label>
+            <label class="field">
+              <span>月度预算</span>
+              <div class="number-wrap"><b>$</b><input id="monthly-budget" type="number" min="0" step="50" inputmode="decimal" /><i>USD</i></div>
+            </label>
+          </div>
+
+          <div class="cache-row">
+            <div class="cache-copy">
+              <span>输入缓存命中率</span>
+              <small>重复的系统提示词、文档或对话前缀</small>
+            </div>
+            <input id="cache-rate" type="range" min="0" max="100" step="5" />
+            <output id="cache-output" for="cache-rate">0%</output>
+          </div>
+
+          <details class="optional-settings">
+            <summary>更多设置 <span>人民币换算与自定义模型</span></summary>
+            <div class="optional-body">
+              <label class="field exchange-field">
+                <span>1 美元 ≈ 人民币</span>
+                <div class="number-wrap"><input id="cny-rate" type="number" min="0" step="0.01" inputmode="decimal" /><i>CNY</i></div>
+                <small>手动参考值，不是实时汇率</small>
+              </label>
+
+              <div class="custom-model">
+                <label class="custom-toggle">
+                  <input id="custom-enabled" type="checkbox" />
+                  <span>加入一个自定义模型</span>
+                </label>
+                <div class="custom-fields" id="custom-fields">
+                  <label><span>模型名称</span><input id="custom-name" type="text" maxlength="30" value="我的模型" /></label>
+                  <label><span>输入价</span><input id="custom-input" type="number" min="0" step="0.01" value="1" /></label>
+                  <label><span>缓存价</span><input id="custom-cache" type="number" min="0" step="0.01" value="0.1" /></label>
+                  <label><span>输出价</span><input id="custom-output" type="number" min="0" step="0.01" value="5" /></label>
+                </div>
+                <small>价格单位均为 USD / 100 万 Token</small>
+              </div>
+            </div>
+          </details>
+        </div>
+      </section>
+
+      <section class="results" aria-labelledby="results-title" aria-live="polite">
+        <div class="section-heading result-heading">
+          <div><span>02</span><h3 id="results-title">比较结果</h3></div>
+          <button class="export-button" id="export-button" type="button">导出 CSV</button>
+        </div>
+
+        <div class="provider-tabs" role="group" aria-label="模型厂商筛选">
+          <button type="button" class="active" data-provider="all">全部</button>
+          <button type="button" data-provider="OpenAI">OpenAI</button>
+          <button type="button" data-provider="Anthropic">Claude</button>
+          <button type="button" data-provider="Google">Gemini</button>
+          <button type="button" data-provider="Custom">自定义</button>
+        </div>
+
+        <article class="winner-card">
+          <div class="winner-copy">
+            <span>当前最低月成本</span>
+            <strong id="winner-name">—</strong>
+            <p id="winner-note">—</p>
+          </div>
+          <div class="winner-cost">
+            <strong id="winner-usd">$0</strong>
+            <span id="winner-cny">≈ ¥0 / 月</span>
+          </div>
+          <div class="budget-meter"><i id="budget-bar"></i></div>
+          <div class="budget-copy">
+            <span id="budget-status">等待计算</span>
+            <span id="saving-copy">—</span>
+          </div>
+        </article>
+
+        <div class="context-warning hidden" id="context-warning">已为超长输入采用相应的长上下文费率。</div>
+        <div class="model-list" id="model-list"></div>
+        <div class="empty-state hidden" id="empty-state">当前筛选下没有模型，请换一个分类。</div>
+      </section>
+
+      <details class="price-notes">
+        <summary>价格与估算说明</summary>
+        <div>
+          <p>估算仅包含文本输入、缓存输入与文本输出 Token。未包含缓存存储、工具调用、搜索、图片/音频、Batch、Priority、税费或平台加价。</p>
+          <p id="source-links"></p>
+        </div>
+      </details>
+
+      <footer><span></span>所有输入和计算都保留在你的浏览器中</footer>
+    </main>
+
+    <script src="pricing.js"></script>
+    <script src="popup.js"></script>
+  </body>
+</html>

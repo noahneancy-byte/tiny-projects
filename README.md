@@ -5,4 +5,4 @@
 | 编号 | 项目 | 状态 |
 | --- | --- | --- |
 | 01 | [JSON / JSONL 数据集检查器](./01-json-jsonl-validator) | ✅ 第一版完成 |
-
+| 02 | [Token Budget — AI 成本计算器](./02-ai-cost-calculator) | ✅ 第一版完成 |
